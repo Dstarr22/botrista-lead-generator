@@ -28,11 +28,18 @@ const initialLeads = [
 function App() {
   const [search, setSearch] = useState('');
   const [leads, setLeads] = useState(initialLeads);
+  const [newLead, setNewLead] = useState({ name: '', sector: '', contact: '', status: 'Follow-Up', notes: '' });
 
   const updateLead = (index, field, value) => {
     const newLeads = [...leads];
     newLeads[index][field] = value;
     setLeads(newLeads);
+  };
+
+  const addNewLead = () => {
+    if (!newLead.name || !newLead.sector || !newLead.contact) return;
+    setLeads([...leads, newLead]);
+    setNewLead({ name: '', sector: '', contact: '', status: 'Follow-Up', notes: '' });
   };
 
   const filteredLeads = leads.filter(
@@ -45,6 +52,23 @@ function App() {
   return (
     <main style={{ padding: '1.5rem', fontFamily: 'Arial, sans-serif', maxWidth: '700px', margin: 'auto' }}>
       <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '1rem' }}>Botrista Lead Generator</h1>
+
+      <section style={{ marginBottom: '2rem' }}>
+        <h2>Add New Lead</h2>
+        <input placeholder="Business Name" value={newLead.name} onChange={(e) => setNewLead({ ...newLead, name: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
+        <input placeholder="Sector" value={newLead.sector} onChange={(e) => setNewLead({ ...newLead, sector: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
+        <input placeholder="Contact" value={newLead.contact} onChange={(e) => setNewLead({ ...newLead, contact: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
+        <select value={newLead.status} onChange={(e) => setNewLead({ ...newLead, status: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}>
+          <option value="Follow-Up">Follow-Up</option>
+          <option value="Outreach Sent">Outreach Sent</option>
+          <option value="Interested">Interested</option>
+          <option value="Needs Review">Needs Review</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <textarea placeholder="Notes" value={newLead.notes} onChange={(e) => setNewLead({ ...newLead, notes: e.target.value })} rows="3" style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
+        <button onClick={addNewLead} style={{ padding: '0.5rem 1rem', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '4px' }}>Add Lead</button>
+      </section>
+
       <input
         type="text"
         placeholder="Search leads..."
@@ -52,6 +76,7 @@ function App() {
         onChange={(e) => setSearch(e.target.value)}
         style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem', fontSize: '1rem' }}
       />
+
       {filteredLeads.map((lead, index) => (
         <div
           key={index}

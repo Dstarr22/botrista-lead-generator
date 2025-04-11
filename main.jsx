@@ -26,9 +26,12 @@ const initialLeads = [
 ];
 
 function App() {
+  const [tab, setTab] = useState('leads');
   const [search, setSearch] = useState('');
   const [leads, setLeads] = useState(initialLeads);
   const [newLead, setNewLead] = useState({ name: '', sector: '', contact: '', status: 'Follow-Up', notes: '' });
+  const [sectorFilter, setSectorFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   const updateLead = (index, field, value) => {
     const newLeads = [...leads];
@@ -40,86 +43,49 @@ function App() {
     if (!newLead.name || !newLead.sector || !newLead.contact) return;
     setLeads([...leads, newLead]);
     setNewLead({ name: '', sector: '', contact: '', status: 'Follow-Up', notes: '' });
+    setTab('leads');
   };
 
-  const filteredLeads = leads.filter(
-    (lead) =>
+  const filteredLeads = leads.filter((lead) => {
+    const matchesSearch =
       lead.name.toLowerCase().includes(search.toLowerCase()) ||
       lead.sector.toLowerCase().includes(search.toLowerCase()) ||
-      lead.contact.toLowerCase().includes(search.toLowerCase())
-  );
+      lead.contact.toLowerCase().includes(search.toLowerCase());
+    const matchesSector = sectorFilter ? lead.sector === sectorFilter : true;
+    const matchesStatus = statusFilter ? lead.status === statusFilter : true;
+    return matchesSearch && matchesSector && matchesStatus;
+  });
 
   return (
-    <main style={{ padding: '1.5rem', fontFamily: 'Arial, sans-serif', maxWidth: '700px', margin: 'auto' }}>
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '1rem' }}>Botrista Lead Generator</h1>
+    <main style={{ padding: '1.5rem', fontFamily: 'Arial, sans-serif', maxWidth: '750px', margin: 'auto' }}>
+      <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '1rem', textAlign: 'center' }}>Botrista Lead Generator</h1>
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2>Add New Lead</h2>
-        <input placeholder="Business Name" value={newLead.name} onChange={(e) => setNewLead({ ...newLead, name: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
-        <input placeholder="Sector" value={newLead.sector} onChange={(e) => setNewLead({ ...newLead, sector: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
-        <input placeholder="Contact" value={newLead.contact} onChange={(e) => setNewLead({ ...newLead, contact: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
-        <select value={newLead.status} onChange={(e) => setNewLead({ ...newLead, status: e.target.value })} style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}>
-          <option value="Follow-Up">Follow-Up</option>
-          <option value="Outreach Sent">Outreach Sent</option>
-          <option value="Interested">Interested</option>
-          <option value="Needs Review">Needs Review</option>
-          <option value="Closed">Closed</option>
-        </select>
-        <textarea placeholder="Notes" value={newLead.notes} onChange={(e) => setNewLead({ ...newLead, notes: e.target.value })} rows="3" style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }} />
-        <button onClick={addNewLead} style={{ padding: '0.5rem 1rem', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '4px' }}>Add Lead</button>
-      </section>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
+        <button onClick={() => setTab('leads')} style={{ padding: '0.5rem 1rem', background: tab === 'leads' ? '#0070f3' : '#ddd', color: tab === 'leads' ? '#fff' : '#000' }}>Leads</button>
+        <button onClick={() => setTab('add')} style={{ padding: '0.5rem 1rem', background: tab === 'add' ? '#0070f3' : '#ddd', color: tab === 'add' ? '#fff' : '#000' }}>Add Lead</button>
+        <button onClick={() => setTab('outreach')} style={{ padding: '0.5rem 1rem', background: tab === 'outreach' ? '#0070f3' : '#ddd', color: tab === 'outreach' ? '#fff' : '#000' }}>Outreach</button>
+      </div>
 
-      <input
-        type="text"
-        placeholder="Search leads..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem', fontSize: '1rem' }}
-      />
+      {tab === 'leads' && (
+        <>
+          <input
+            type="text"
+            placeholder="Search leads..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          />
 
-      {filteredLeads.map((lead, index) => (
-        <div
-          key={index}
-          style={{
-            border: '1px solid #ccc',
-            padding: '1rem',
-            marginBottom: '1rem',
-            borderRadius: '10px',
-            background: '#f9f9f9'
-          }}
-        >
-          <h2 style={{ margin: '0 0 0.3rem' }}>{lead.name}</h2>
-          <p style={{ margin: '0.2rem 0' }}><strong>Sector:</strong> {lead.sector}</p>
-          <p style={{ margin: '0.2rem 0' }}><strong>Contact:</strong> {lead.contact}</p>
-          <label>
-            <strong>Status:</strong>
-            <select
-              value={lead.status}
-              onChange={(e) => updateLead(index, 'status', e.target.value)}
-              style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
-            >
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <select value={sectorFilter} onChange={(e) => setSectorFilter(e.target.value)} style={{ flex: 1, padding: '0.5rem' }}>
+              <option value="">All Sectors</option>
+              <option value="Hospital">Hospital</option>
+              <option value="Private School">Private School</option>
+              <option value="Public School">Public School</option>
+            </select>
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ flex: 1, padding: '0.5rem' }}>
+              <option value="">All Statuses</option>
               <option value="Follow-Up">Follow-Up</option>
               <option value="Outreach Sent">Outreach Sent</option>
               <option value="Interested">Interested</option>
-              <option value="Needs Review">Needs Review</option>
-              <option value="Closed">Closed</option>
-            </select>
-          </label>
-          <div style={{ marginTop: '0.5rem' }}>
-            <label>
-              <strong>Notes:</strong>
-              <textarea
-                value={lead.notes}
-                onChange={(e) => updateLead(index, 'notes', e.target.value)}
-                rows="3"
-                style={{ width: '100%', marginTop: '0.3rem', padding: '0.5rem' }}
-              />
-            </label>
-          </div>
-        </div>
-      ))}
-    </main>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+              <option value="

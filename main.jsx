@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
-const leadsData = [
+const initialLeads = [
   {
     name: 'Sunrise Hospital',
     sector: 'Hospital',
@@ -27,7 +27,15 @@ const leadsData = [
 
 function App() {
   const [search, setSearch] = useState('');
-  const filteredLeads = leadsData.filter(
+  const [leads, setLeads] = useState(initialLeads);
+
+  const updateLead = (index, field, value) => {
+    const newLeads = [...leads];
+    newLeads[index][field] = value;
+    setLeads(newLeads);
+  };
+
+  const filteredLeads = leads.filter(
     (lead) =>
       lead.name.toLowerCase().includes(search.toLowerCase()) ||
       lead.sector.toLowerCase().includes(search.toLowerCase()) ||
@@ -35,7 +43,7 @@ function App() {
   );
 
   return (
-    <main style={{ padding: '1.5rem', fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: 'auto' }}>
+    <main style={{ padding: '1.5rem', fontFamily: 'Arial, sans-serif', maxWidth: '700px', margin: 'auto' }}>
       <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '1rem' }}>Botrista Lead Generator</h1>
       <input
         type="text"
@@ -58,8 +66,31 @@ function App() {
           <h2 style={{ margin: '0 0 0.3rem' }}>{lead.name}</h2>
           <p style={{ margin: '0.2rem 0' }}><strong>Sector:</strong> {lead.sector}</p>
           <p style={{ margin: '0.2rem 0' }}><strong>Contact:</strong> {lead.contact}</p>
-          <p style={{ margin: '0.2rem 0' }}><strong>Status:</strong> {lead.status}</p>
-          <p style={{ margin: '0.5rem 0 0', fontStyle: 'italic' }}>{lead.notes}</p>
+          <label>
+            <strong>Status:</strong>
+            <select
+              value={lead.status}
+              onChange={(e) => updateLead(index, 'status', e.target.value)}
+              style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
+            >
+              <option value="Follow-Up">Follow-Up</option>
+              <option value="Outreach Sent">Outreach Sent</option>
+              <option value="Interested">Interested</option>
+              <option value="Needs Review">Needs Review</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </label>
+          <div style={{ marginTop: '0.5rem' }}>
+            <label>
+              <strong>Notes:</strong>
+              <textarea
+                value={lead.notes}
+                onChange={(e) => updateLead(index, 'notes', e.target.value)}
+                rows="3"
+                style={{ width: '100%', marginTop: '0.3rem', padding: '0.5rem' }}
+              />
+            </label>
+          </div>
         </div>
       ))}
     </main>
